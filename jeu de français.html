@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Français 5e–4e 🎨</title>
+<style>
+:root{
+  --blue:#3498db;--green:#2ecc71;--yellow:#f1c40f;--red:#e74c3c;--purple:#9b59b6;--teal:#1abc9c;
+}
+body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:linear-gradient(135deg,var(--teal),var(--blue));display:flex;justify-content:center;align-items:center;min-height:100vh}
+.game{background:#fff;width:100%;max-width:680px;border-radius:24px;padding:20px;box-shadow:0 14px 30px rgba(0,0,0,.25)}
+h1,h2{text-align:center;margin:8px 0}
+.hidden{display:none}
+button{width:100%;padding:14px;margin:10px 0;border:none;border-radius:16px;font-size:1.05em;cursor:pointer}
+.start{background:var(--yellow)}
+.header{display:flex;justify-content:flex-end;margin-bottom:10px}
+.badge{padding:6px 12px;border-radius:999px;color:#fff;font-weight:600;background:var(--green)}
+.card{border-radius:20px;padding:16px;background:linear-gradient(135deg,#ecf7ff,#ffffff)}
+.theme{font-weight:700;color:var(--purple)}
+.question{font-size:1.25em;margin:10px 0 14px}
+.answers button{background:#ecf0f1}
+.answers button:nth-child(1){border-left:8px solid var(--blue)}
+.answers button:nth-child(2){border-left:8px solid var(--green)}
+.answers button:nth-child(3){border-left:8px solid var(--yellow)}
+.answers button:nth-child(4){border-left:8px solid var(--red)}
+.correct{background:var(--green)!important;color:#fff}
+.wrong{background:var(--red)!important;color:#fff}
+.next{background:var(--blue);color:#fff}
+.explain-wrap{margin-top:14px;border-radius:20px;padding:16px;background:linear-gradient(135deg,#fff7e6,#ffffff);border:2px dashed var(--yellow)}
+.explain-title{font-weight:800;color:#e67e22;margin-bottom:6px}
+.explain-text{line-height:1.45}
+.section-screen{ text-align:center }
+.score-table{margin-top:15px;text-align:left}
+.score-table div{padding:6px 0}
+@media(max-width:600px){.game{border-radius:0;min-height:100vh}}
+</style>
+</head>
+<body>
+<div class="game">
+
+<div id="menu">
+<h1>🎨 Quiz de Français (5e–4e)</h1>
+<p style="text-align:center">Questions colorées • explications détaillées • mobile friendly</p>
+<button class="start" onclick="start()">▶️ Commencer</button>
+</div>
+
+<div id="quiz" class="hidden">
+<div class="header">
+<span class="badge" id="score"></span>
+</div>
+
+<div class="card">
+<div class="theme" id="theme"></div>
+<div class="question" id="question"></div>
+<div class="answers" id="answers"></div>
+</div>
+
+<div id="explain" class="explain-wrap hidden">
+<div class="explain-title">🧠 Comprendre la réponse</div>
+<div class="explain-text" id="explainText"></div>
+</div>
+
+<button id="next" class="next hidden">➡️ Question suivante</button>
+</div>
+
+<div id="section" class="hidden section-screen">
+<h2 id="sectionTitle"></h2>
+<p id="sectionScore"></p>
+<button class="next" onclick="continueQuiz()">▶ Continuer</button>
+</div>
+
+<div id="end" class="hidden">
+<h2>🏆 Résultat final</h2>
+<div class="score-table" id="scoreTable"></div>
+<p id="final" style="text-align:center;font-size:1.2em"></p>
+<button onclick="location.reload()">🔁 Rejouer</button>
+</div>
+
+</div>
+
+<script>
+
+const themeEmojis={
+"Accord du participe passé":"✍️",
+"Expansion du nom":"🧩",
+"Subordonnée relative":"🔗",
+"Homophones en é":"🔤",
+"Phrase complexe":"🧠"
+};
+
+const questions=[
+
+// Accord du participe passé
+{theme:'Accord du participe passé',q:'Dans la phrase « Les pommes que j’ai mangées étaient délicieuses », pourquoi écrit‑on « mangées » avec un -es à la fin ?',a:['Parce que le sujet est féminin','Parce que le COD est placé avant le verbe','Parce que le verbe est au passé','Parce que la phrase est longue'],c:1,e:'Avec l’auxiliaire « avoir », le participe passé ne s’accorde normalement pas. Cependant, il s’accorde lorsque le complément d’objet direct (COD) est placé avant le verbe. Ici, le pronom relatif « que » remplace « les pommes » et se situe avant le verbe « ai mangé ». Le participe passé s’accorde donc avec « pommes », féminin pluriel.'},
+{theme:'Accord du participe passé',q:'Dans « Elle a terminé son exercice », pourquoi le participe passé « terminé » reste‑t‑il invariable ?',a:['Parce que le sujet est féminin','Parce que le COD est placé après le verbe','Parce que le verbe est au présent','Parce que la phrase est affirmative'],c:1,e:'Avec l’auxiliaire « avoir », le participe passé s’accorde seulement si le COD est placé avant le verbe. Dans cette phrase, le COD « son exercice » est placé après le verbe. Le participe passé reste donc invariable.'},
+{theme:'Accord du participe passé',q:'Dans « Les lettres qu’il a écrites hier », quelle règle explique l’accord du participe passé « écrites » ?',a:['Le sujet est pluriel','Le COD est placé avant le verbe','Le verbe est long','La phrase contient un complément circonstanciel'],c:1,e:'Le pronom relatif « que » remplace « les lettres » et se trouve avant le verbe « a écrit ». Comme il s’agit du COD placé avant le verbe conjugué avec « avoir », le participe passé doit s’accorder avec ce COD : « écrites ».'},
+{theme:'Accord du participe passé',q:'Dans « Ils se sont parlé pendant une heure », pourquoi le participe passé « parlé » ne s’accorde‑t‑il pas ?',a:['Parce que le sujet est pluriel','Parce que le verbe utilise un complément d’objet indirect','Parce que le verbe est au passé composé','Parce que la phrase est trop courte'],c:1,e:'Le verbe « parler » se construit avec un complément d’objet indirect (parler à quelqu’un). Dans ce cas, le pronom « se » est COI et non COD. Le participe passé ne s’accorde donc pas.'},
+{theme:'Accord du participe passé',q:'Dans « Elle est arrivée en retard », pourquoi écrit‑on « arrivée » avec un -e ?',a:['Parce que le verbe est conjugué avec l’auxiliaire être','Parce que le COD est avant le verbe','Parce que la phrase est au passé','Parce que le verbe est long'],c:0,e:'Avec l’auxiliaire « être », le participe passé s’accorde avec le sujet. Ici, le sujet « elle » est féminin singulier : on écrit donc « arrivée ».'},
+{theme:'Accord du participe passé',q:'Dans « Les fleurs ont poussé rapidement », pourquoi le participe passé reste‑t‑il invariable ?',a:['Parce que le sujet est pluriel','Parce qu’il n’y a pas de COD placé avant le verbe','Parce que la phrase contient un adverbe','Parce que le verbe est court'],c:1,e:'Le verbe est conjugué avec « avoir » et aucun COD n’est placé avant le verbe. Dans ce cas, le participe passé reste invariable.'},
+{theme:'Accord du participe passé',q:'Dans « Les chansons qu’elle a chantées hier », pourquoi écrit‑on « chantées » ?',a:['Parce que le sujet est féminin','Parce que le COD est placé avant le verbe','Parce que le verbe est au passé','Parce que la phrase est longue'],c:1,e:'Le pronom relatif « que » remplace « les chansons » et se trouve avant le verbe « a chanté ». Comme il s’agit du COD placé avant, le participe passé s’accorde avec « chansons », féminin pluriel.'},
+{theme:'Accord du participe passé',q:'Dans « Elle a pris les clés », pourquoi le participe passé « pris » ne s’accorde‑t‑il pas ?',a:['Parce que le sujet est féminin','Parce que le COD est placé après le verbe','Parce que le verbe est irrégulier','Parce que la phrase est affirmative'],c:1,e:'Le COD « les clés » est placé après le verbe « a pris ». Avec l’auxiliaire « avoir », l’accord ne se fait que si le COD est placé avant.'},
+{theme:'Accord du participe passé',q:'Dans le groupe « les décisions prises hier », avec quel mot le participe passé « prises » s’accorde‑t‑il ?',a:['avec le verbe','avec le nom « décisions »','avec l’adverbe','avec le complément de temps'],c:1,e:'Le participe passé est ici employé comme adjectif et qualifie le nom « décisions ». Il s’accorde donc en genre et en nombre avec ce nom.'},
+{theme:'Accord du participe passé',q:'Dans « Ils sont partis tôt ce matin », avec quel mot s’accorde le participe passé ?',a:['avec le sujet','avec le COD','avec le complément circonstanciel','avec le verbe'],c:0,e:'Le verbe est conjugué avec l’auxiliaire « être ». Dans ce cas, le participe passé s’accorde avec le sujet « ils », masculin pluriel.'},
+
+// Expansion du nom
+{theme:'Expansion du nom',q:'Dans le groupe nominal « une maison en pierre », quelle expression constitue l’expansion du nom ?',a:['une','maison','en pierre','pierre'],c:2,e:'L’expansion du nom est un groupe de mots qui apporte une précision sur le nom. Ici, « en pierre » complète le nom « maison » et précise la matière dont elle est faite.'},
+{theme:'Expansion du nom',q:'Dans « un chien très gentil », quel groupe de mots est une expansion du nom ?',a:['chien','très gentil','un','très'],c:1,e:'Le groupe adjectival « très gentil » apporte une information supplémentaire sur le nom « chien ». Il s’agit donc d’une expansion du nom.'},
+{theme:'Expansion du nom',q:'Dans « le bruit de la pluie », quel groupe constitue l’expansion du nom ?',a:['le','bruit','de la pluie','pluie'],c:2,e:'Le groupe prépositionnel « de la pluie » précise l’origine du bruit. Il complète le nom « bruit » : c’est une expansion du nom.'},
+{theme:'Expansion du nom',q:'Dans « un château médiéval », quel mot est l’expansion du nom ?',a:['un','médiéval','château','est'],c:1,e:'L’adjectif qualificatif « médiéval » précise le type de château. Il s’agit donc d’une expansion du nom.'},
+{theme:'Expansion du nom',q:'Dans « une robe rouge », quel mot fonctionne comme expansion du nom ?',a:['robe','rouge','une','est'],c:1,e:'L’adjectif « rouge » apporte une précision sur le nom « robe ». Il joue donc le rôle d’expansion du nom.'},
+{theme:'Expansion du nom',q:'Dans « un livre passionnant », quel mot constitue l’expansion ?',a:['livre','passionnant','un','le'],c:1,e:'L’adjectif qualificatif « passionnant » apporte une information sur le nom « livre ».'},
+{theme:'Expansion du nom',q:'Dans « le bruit du vent », quel groupe est l’expansion ?',a:['du vent','le','bruit','vent'],c:0,e:'Le groupe prépositionnel « du vent » complète le nom « bruit » et en précise la cause.'},
+{theme:'Expansion du nom',q:'Dans « une décision difficile », quel mot est l’expansion du nom ?',a:['difficile','décision','une','est'],c:0,e:'L’adjectif qualificatif « difficile » apporte une précision sur le nom « décision ».'},
+{theme:'Expansion du nom',q:'Dans « une maison qui brille au soleil », quelle est l’expansion du nom ?',a:['qui brille au soleil','maison','une','brille'],c:0,e:'La proposition subordonnée relative « qui brille au soleil » complète le nom « maison » et apporte une information supplémentaire.'},
+{theme:'Expansion du nom',q:'Dans « un arbre très grand », quel groupe constitue l’expansion ?',a:['très','grand','très grand','arbre'],c:2,e:'Le groupe adjectival « très grand » apporte une précision sur le nom « arbre ».'},
+
+// Subordonnées relatives
+{theme:'Subordonnée relative',q:'Dans la phrase « Le chien qui aboie réveille le voisinage », quelle est la proposition subordonnée relative ?',a:['Le chien','qui aboie','aboie','chien'],c:1,e:'Une proposition subordonnée relative est introduite par un pronom relatif comme « qui », « que », « dont » ou « où ». Ici, « qui aboie » apporte une précision sur le nom « chien ».'},
+{theme:'Subordonnée relative',q:'Dans « La maison que je vois est très ancienne », quelle est la proposition subordonnée relative ?',a:['La maison','que je vois','je vois','vois'],c:1,e:'La proposition « que je vois » est introduite par le pronom relatif « que » et complète le nom « maison ».'},
+{theme:'Subordonnée relative',q:'Dans « Le livre dont je parle est passionnant », quel mot est le pronom relatif ?',a:['dont','livre','je','parle'],c:0,e:'Le mot « dont » introduit la proposition subordonnée relative et renvoie au nom « livre ».'},
+{theme:'Subordonnée relative',q:'Dans « L’endroit où je vais chaque été est magnifique », quel mot est le pronom relatif ?',a:['où','je','vais','endroit'],c:0,e:'Le pronom relatif « où » introduit la proposition subordonnée relative et indique souvent un lieu.'},
+{theme:'Subordonnée relative',q:'Quel mot introduit le plus souvent une proposition subordonnée relative ?',a:['qui','mais','donc','car'],c:0,e:'Le pronom relatif « qui » est l’un des plus fréquents pour introduire une proposition subordonnée relative.'},
+{theme:'Subordonnée relative',q:'Dans « L’élève qui travaille régulièrement réussit », quelle est la relative ?',a:['élève','qui travaille régulièrement','travaille','qui'],c:1,e:'La proposition « qui travaille régulièrement » apporte une précision sur le nom « élève ».'},
+{theme:'Subordonnée relative',q:'Dans « Le film que nous regardons est très intéressant », quelle est la relative ?',a:['que nous regardons','film','nous','regardons'],c:0,e:'La proposition « que nous regardons » est introduite par le pronom relatif « que ».'},
+{theme:'Subordonnée relative',q:'Dans « La ville où j’habite est très ancienne », quelle est la relative ?',a:['ville','où j’habite','habite','où'],c:1,e:'La proposition « où j’habite » complète le nom « ville ».'},
+{theme:'Subordonnée relative',q:'Dans « Le professeur dont je parle est absent », quel est le pronom relatif ?',a:['dont','je','professeur','parle'],c:0,e:'Le pronom relatif « dont » introduit la proposition subordonnée relative.'},
+{theme:'Subordonnée relative',q:'Dans « Le livre qui est sur la table est à moi », quelle est la relative ?',a:['livre','qui est sur la table','table','est'],c:1,e:'La proposition « qui est sur la table » précise le nom « livre ».'},
+
+// Homophones en é
+{theme:'Homophones en é',q:'Dans la phrase « Il va manger », quelle terminaison doit‑on utiliser ?',a:['é','er','ai','ait'],c:1,e:'Après un verbe conjugué comme « va », on utilise généralement l’infinitif. L’infinitif des verbes du premier groupe se termine en « -er ».'},
+{theme:'Homophones en é',q:'Dans « J’ai mangé une pomme », quelle terminaison convient ?',a:['é','er','ait','ai'],c:0,e:'Après l’auxiliaire « avoir », le verbe est au participe passé. Pour les verbes du premier groupe, il se termine par « -é ».'},
+{theme:'Homophones en é',q:'Dans « Il voulait manger avant de partir », quelle terminaison est correcte ?',a:['é','er','ai','ait'],c:1,e:'Après un autre verbe conjugué, on emploie généralement l’infinitif : « manger ».'},
+{theme:'Homophones en é',q:'Dans « Elle a regardé le film », quelle terminaison est correcte ?',a:['é','er','ai','ait'],c:0,e:'Le verbe suit l’auxiliaire « a » : il est donc au participe passé « regardé ».'},
+{theme:'Homophones en é',q:'Dans « Je vais regarder ce documentaire », quelle terminaison est correcte ?',a:['er','é','ai','ait'],c:0,e:'Après « vais », on emploie l’infinitif du verbe : « regarder ».'},
+{theme:'Homophones en é',q:'Dans « Il a terminé son devoir », quelle terminaison convient ?',a:['er','é','ait','ai'],c:1,e:'Le verbe est au participe passé après l’auxiliaire « a ».'},
+{theme:'Homophones en é',q:'Dans « Nous allons jouer dans le jardin », quelle terminaison doit‑on utiliser ?',a:['é','er','ai','ait'],c:1,e:'Après « allons », on emploie l’infinitif : « jouer ».'},
+{theme:'Homophones en é',q:'Dans « Elle a chanté toute la soirée », quelle terminaison est correcte ?',a:['er','é','ait','ai'],c:1,e:'Le verbe suit l’auxiliaire « a » : il est donc au participe passé.'},
+{theme:'Homophones en é',q:'Dans « Tu dois travailler davantage », quelle terminaison est correcte ?',a:['er','é','ai','ait'],c:0,e:'Après le verbe « dois », on emploie l’infinitif du verbe.'},
+{theme:'Homophones en é',q:'Dans « Il a gagné la course », quelle terminaison convient ?',a:['er','é','ai','ait'],c:1,e:'Le verbe est au participe passé après l’auxiliaire « a ».'},
+
+// Phrase complexe
+{theme:'Phrase complexe',q:'Qu’appelle‑t‑on une phrase complexe ?',a:['Une phrase qui contient plusieurs verbes conjugués','Une phrase très longue','Une phrase avec beaucoup de mots','Une phrase difficile à comprendre'],c:0,e:'Une phrase complexe est constituée de plusieurs propositions. Elle contient donc au moins deux verbes conjugués.'},
+{theme:'Phrase complexe',q:'Dans « Je pense qu’il viendra demain », combien y a‑t‑il de verbes conjugués ?',a:['1','2','3','4'],c:1,e:'La phrase contient deux verbes conjugués : « pense » et « viendra ». Elle est donc complexe.'},
+{theme:'Phrase complexe',q:'Dans « Il mange et il part », combien y a‑t‑il de propositions ?',a:['1','2','3','4'],c:1,e:'La phrase contient deux propositions reliées par la conjonction « et ».'},
+{theme:'Phrase complexe',q:'Dans « Quand il pleut, je reste à la maison », combien y a‑t‑il de propositions ?',a:['1','2','3','4'],c:1,e:'La proposition « Quand il pleut » dépend de la proposition principale « je reste à la maison ».'},
+{theme:'Phrase complexe',q:'Dans « Je vois le chien qui court dans le jardin », combien y a‑t‑il de verbes ?',a:['1','2','3','4'],c:1,e:'Les verbes conjugués sont « vois » et « court » : la phrase est donc complexe.'},
+{theme:'Phrase complexe',q:'Dans « Il mange une pomme », de quel type de phrase s’agit‑il ?',a:['Phrase simple','Phrase complexe','Phrase relative','Phrase composée'],c:0,e:'Cette phrase ne contient qu’un seul verbe conjugué : « mange ». Elle est donc simple.'},
+{theme:'Phrase complexe',q:'Dans « Je pars parce que je suis fatigué », combien y a‑t‑il de propositions ?',a:['1','2','3','4'],c:1,e:'La proposition « parce que je suis fatigué » explique la cause de l’action.'},
+{theme:'Phrase complexe',q:'Dans « L’élève qui travaille sérieusement réussit », combien y a‑t‑il de verbes conjugués ?',a:['1','2','3','4'],c:1,e:'Les verbes conjugués sont « travaille » et « réussit ».'},
+{theme:'Phrase complexe',q:'Dans « Il court et il saute », combien y a‑t‑il de verbes conjugués ?',a:['1','2','3','4'],c:1,e:'La phrase contient deux verbes conjugués : « court » et « saute ».'},
+{theme:'Phrase complexe',q:'Dans « Quand il arrive, nous partons immédiatement », combien y a‑t‑il de propositions ?',a:['1','2','3','4'],c:1,e:'La phrase comporte deux propositions : « Quand il arrive » et « nous partons immédiatement ».'}
+
+];
+
+let idx=0;
+let score=0;
+let sectionScore=0;
+let sectionIndex=0;
+
+const sections=[
+"Accord du participe passé",
+"Expansion du nom",
+"Subordonnée relative",
+"Homophones en é",
+"Phrase complexe"
+];
+
+const sectionResults={};
+sections.forEach(s=>sectionResults[s]=0);
+
+function shuffle(array){
+  for(let i=array.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [array[i],array[j]]=[array[j],array[i]];
+  }
+  return array;
+}
+
+function start(){
+  document.getElementById('menu').classList.add('hidden');
+  document.getElementById('quiz').classList.remove('hidden');
+  load();
+}
+
+function load(){
+  if(idx>=questions.length){end();return;}
+
+  document.getElementById('score').textContent='Score '+score;
+
+  const q=questions[idx];
+
+  document.getElementById('theme').textContent=themeEmojis[q.theme]+" "+q.theme;
+  document.getElementById('question').textContent=q.q;
+
+  const answersDiv=document.getElementById('answers');
+  answersDiv.innerHTML='';
+
+  document.getElementById('explain').classList.add('hidden');
+  document.getElementById('next').classList.add('hidden');
+
+  const shuffledAnswers = shuffle(q.a.map((text,i)=>({text,correct:i===q.c})));
+
+  shuffledAnswers.forEach(ans=>{
+    const btn=document.createElement('button');
+    btn.textContent=ans.text;
+    btn.dataset.correct=ans.correct;
+    btn.onclick=()=>select(btn,ans.correct);
+    answersDiv.appendChild(btn);
+  });
+}
+
+function select(btn,isCorrect){
+  const buttons=document.querySelectorAll('.answers button');
+  buttons.forEach(b=>b.disabled=true);
+
+  const currentTheme=questions[idx].theme;
+
+  if(isCorrect){
+    btn.classList.add('correct');
+    score++;
+    sectionScore++;
+    sectionResults[currentTheme]++;
+  }else{
+    btn.classList.add('wrong');
+    buttons.forEach(b=>{
+      if(b.dataset.correct==='true'){
+        b.classList.add('correct');
+      }
+    });
+  }
+
+  document.getElementById('explainText').textContent=questions[idx].e;
+  document.getElementById('explain').classList.remove('hidden');
+  document.getElementById('next').classList.remove('hidden');
+}
+
+
+document.getElementById('next').onclick=()=>{
+
+  idx++;
+
+  if(idx%10===0){
+
+    const theme=sections[sectionIndex];
+
+    document.getElementById('quiz').classList.add('hidden');
+    document.getElementById('section').classList.remove('hidden');
+
+    document.getElementById('sectionTitle').textContent="Section terminée : "+themeEmojis[theme]+" "+theme;
+
+    document.getElementById('sectionScore').textContent="Score de la section : "+sectionScore+" / 10";
+
+    sectionScore=0;
+    sectionIndex++;
+
+  }else{
+
+    load();
+
+  }
+
+};
+
+function continueQuiz(){
+  document.getElementById('section').classList.add('hidden');
+
+  if(idx>=questions.length){
+    end();
+    return;
+  }
+
+  document.getElementById('quiz').classList.remove('hidden');
+  load();
+}
+
+function end(){
+
+  document.getElementById('section').classList.add('hidden');
+  document.getElementById('quiz').classList.add('hidden');
+  document.getElementById('end').classList.remove('hidden');
+
+  const table=document.getElementById('scoreTable');
+  table.innerHTML="";
+
+  sections.forEach(s=>{
+    const div=document.createElement('div');
+    div.textContent=themeEmojis[s]+" "+s+" : "+sectionResults[s]+" / 10";
+    table.appendChild(div);
+  });
+
+  document.getElementById('final').textContent="Score total : "+score+" / "+questions.length;
+}
+
+</script>
+</body>
+</html>
